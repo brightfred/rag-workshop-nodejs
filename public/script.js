@@ -12,15 +12,23 @@ async function askQuestion() {
     const query = input.value.trim();
     if (!query) return;
   
-    const res = await fetch("/api/chat", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ query })
-    });
-  
-    const data = await res.json();
-    typeWriterEffect(data.answer || "No answer received.");
-  }
+    try {
+        const res = await fetch("/api/chat", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ query })
+        });
+      
+        const data = await res.json();
+        if (data.success) {
+            typeWriterEffect(data.answer);
+        } else {
+            typeWriterEffect("Error: " + (data.error || "Unknown error occurred"));
+        }
+    } catch (error) {
+        typeWriterEffect("Failed to connect to the server. Please try again.");
+    }
+}
   
   // Animate the response with a typing effect
   function typeWriterEffect(text) {
